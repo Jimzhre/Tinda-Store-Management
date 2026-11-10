@@ -22,18 +22,14 @@ TINDA is a web-based inventory and sales management system designed specifically
 ---
 
 ## How to Run Locally (For Teachers/Reviewers)
+## ⚠️ Important Database Setup
+Because database credentials are private, the `config/database.php` file is not included in this repository. 
 
-Because TINDA is built with PHP and MySQL, it cannot be viewed directly on GitHub. Follow these steps to run it on your computer:
-
-1. **Download the Project:** Click the green `<> Code` button above and select **Download ZIP**. Extract the folder.
-2. **Move to XAMPP:** Move the `tinda` folder into your XAMPP `htdocs` directory (e.g., `C:\xampp\htdocs\tinda`).
-3. **Start the Server:** Open the XAMPP Control Panel and start **Apache** and **MySQL**.
-4. **Import the Database:** 
-   - Open your browser and go to `http://localhost/phpmyadmin`.
-   - Click the **Import** tab.
-   - Choose the `tinda.sql` file located in the `tinda/database/` folder.
-   - Click **Go** (or Import) to create the database and tables.
-5. **Run the Website:** Open a new tab and go to `http://localhost/tinda/`.
+To run the project:
+1. Go to the `config` folder.
+2. Rename `database.example.php` to `database.php`.
+3. Open it and update the `$dbpass` if your local MySQL has a password (default is empty).
+4. Import the `tinda_db.sql` file into phpMyAdmin.
 
 ## Test Account
 If you don't want to create a new account, you can use this default test account (or register a new one on the website):
