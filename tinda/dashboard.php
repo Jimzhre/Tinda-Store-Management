@@ -195,9 +195,9 @@ $stmt->close();
                                 while ($row = $recent->fetch_assoc()):
                             ?>
                                 <tr>
-                                    <td>#<?php echo $row['sale_ID']; ?></td>
-                                    <td><?php echo date('M j, g:i A', strtotime($row['sale_date'])); ?></td>
-                                    <td>₱ <?php echo number_format($row['total_amount'], 2); ?></td>
+                                    <td data-label="Sale #">#<?php echo $row['sale_ID']; ?></td>
+                                    <td data-label="Date"><?php echo date('M j, g:i A', strtotime($row['sale_date'])); ?></td>
+                                    <td data-label="Total">₱ <?php echo number_format($row['total_amount'], 2); ?></td>
                                 </tr>
                             <?php
                                 endwhile;

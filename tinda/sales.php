@@ -146,9 +146,9 @@ $recent = $stmt->get_result();
                             <?php if ($recent && $recent->num_rows > 0): ?>
                                 <?php while ($r = $recent->fetch_assoc()): ?>
                                     <tr>
-                                        <td>#<?php echo $r['sale_ID']; ?></td>
-                                        <td><?php echo date('M j, g:i A', strtotime($r['sale_date'])); ?></td>
-                                        <td>₱ <?php echo number_format($r['total_amount'], 2); ?></td>
+                                        <td data-label="Sale #">#<?php echo $r['sale_ID']; ?></td>
+                                        <td data-label="Date"><?php echo date('M j, g:i A', strtotime($r['sale_date'])); ?></td>
+                                        <td data-label="Total">₱ <?php echo number_format($r['total_amount'], 2); ?></td>
                                     </tr>
                                 <?php endwhile; ?>
                             <?php else: ?>

@@ -17,12 +17,6 @@ CREATE TABLE IF NOT EXISTS Categories (
     category_name VARCHAR(80) NOT NULL UNIQUE
 );
 
-CREATE TABLE IF NOT EXISTS Suppliers (
-    supplier_ID     INT AUTO_INCREMENT PRIMARY KEY,
-    supplier_name   VARCHAR(100) NOT NULL,
-    contact_number  VARCHAR(20)
-);
-
 CREATE TABLE IF NOT EXISTS Products (
     product_ID      INT AUTO_INCREMENT PRIMARY KEY,
     category_ID     INT,
@@ -53,14 +47,3 @@ CREATE TABLE IF NOT EXISTS Sale_Details (
 
 INSERT INTO Categories (category_name) VALUES
     ('Snacks'), ('Beverages'), ('Canned Goods'), ('Household'), ('Personal Care');
-
-INSERT INTO Suppliers (supplier_name, contact_number) VALUES
-    ('Mama Sita Trading', '0917-111-2222'),
-    ('JolliCares Wholesale', '0918-333-4444');
-
-INSERT INTO Products (category_ID, product_name, price, stock_quantity, low_stock_threshold) VALUES
-    (1, 'Skyflakes Crackers',      8.00, 50, 10),
-    (2, 'Coke Mismo 300ml',       20.00, 30, 8),
-    (1, 'Piattos Cheese',         22.00, 25, 8),
-    (3, 'Lucky Me Pancit Canton', 15.00, 40, 10),
-    (4, 'Tide Sachet 45g',         9.00, 20, 5);

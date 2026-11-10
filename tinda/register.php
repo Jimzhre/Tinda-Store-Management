@@ -46,9 +46,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <body class="auth-body">
 
     <div class="auth-card">
-        <!-- Back to Login Link -->
-        <a href="login.php" class="back-home">← Back to Login</a>
-
         <div class="auth-header">
             <h1>TINDA<span>.</span></h1>
             <p>Store Management System</p>

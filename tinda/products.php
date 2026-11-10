@@ -182,15 +182,15 @@ $deletedProducts = $stmt->get_result();
                             <?php if ($activeProducts->num_rows > 0): ?>
                                 <?php while ($p = $activeProducts->fetch_assoc()): ?>
                                     <tr>
-                                        <td>
+                                        <td data-label="Name">
                                             <?php echo htmlspecialchars($p['product_name']); ?>
                                             <span style="display:block; font-size:11px; color:#88907F; font-weight:normal;">
                                                 <?php echo htmlspecialchars($p['category_name'] ?? '—'); ?>
                                             </span>
                                         </td>
-                                        <td>₱ <?php echo number_format($p['price'], 2); ?></td>
-                                        <td><?php echo $p['stock_quantity']; ?></td>
-                                        <td style="text-align:right; white-space:nowrap;">
+                                        <td data-label="Price">₱ <?php echo number_format($p['price'], 2); ?></td>
+                                        <td data-label="Stock"><?php echo $p['stock_quantity']; ?></td>
+                                        <td data-label="Actions" style="text-align:right; white-space:nowrap;">
                                             <a href="products.php?edit=<?php echo $p['product_ID']; ?>" class="action-btn edit">Edit</a>
                                             <a href="#" class="action-btn delete" onclick="openModal(<?php echo $p['product_ID']; ?>); return false;">Delete</a>
                                         </td>

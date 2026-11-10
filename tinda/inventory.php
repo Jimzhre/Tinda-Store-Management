@@ -55,11 +55,11 @@ $products = $stmt->get_result();
                             $cls    = $isLow ? 'badge-low' : 'badge-ok';
                             ?>
                             <tr>
-                                <td><?php echo htmlspecialchars($row['product_name']); ?></td>
-                                <td><?php echo htmlspecialchars($row['category_name'] ?? '—'); ?></td>
-                                <td>₱ <?php echo number_format($row['price'], 2); ?></td>
-                                <td><?php echo $row['stock_quantity']; ?></td>
-                                <td><span class="badge <?php echo $cls; ?>"><?php echo $status; ?></span></td>
+                                <td data-label="Product"><?php echo htmlspecialchars($row['product_name']); ?></td>
+                                <td data-label="Category"><?php echo htmlspecialchars($row['category_name'] ?? '—'); ?></td>
+                                <td data-label="Price">₱ <?php echo number_format($row['price'], 2); ?></td>
+                                <td data-label="Stock"><?php echo $row['stock_quantity']; ?></td>
+                                <td data-label="Status"><span class="badge <?php echo $cls; ?>"><?php echo $status; ?></span></td>
                             </tr>
                         <?php endwhile; ?>
                     <?php else: ?>
