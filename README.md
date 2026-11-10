@@ -19,8 +19,6 @@ TINDA is a web-based inventory and sales management system designed specifically
 - **Database:** MySQL
 - **Local Server:** XAMPP
 
----
-
 ## How to Run Locally
 ⚠️ Important Database Setup
 Because database credentials are private, the `config/database.php` file is not included in this repository. 
