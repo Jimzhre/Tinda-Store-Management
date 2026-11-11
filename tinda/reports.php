@@ -69,6 +69,29 @@ $stmt3->bind_param("ssi", $from, $to, $userId);
 $stmt3->execute();
 $topProducts = $stmt3->get_result();
 $stmt3->close();
+
+// --- Items bought in each sale in range (for the "View" popup) ---
+$saleItems = [];
+$stmt4 = $conn->prepare("
+    SELECT sd.sale_ID, p.product_name, sd.quantity, sd.price
+    FROM Sale_Details sd
+    JOIN Sales s ON sd.sale_ID = s.sale_ID
+    JOIN Products p ON sd.product_ID = p.product_ID
+    WHERE DATE(s.sale_date) BETWEEN ? AND ? AND s.user_ID = ?
+    ORDER BY sd.sale_ID, p.product_name
+");
+$stmt4->bind_param("ssi", $from, $to, $userId);
+$stmt4->execute();
+$itemRows = $stmt4->get_result();
+while ($it = $itemRows->fetch_assoc()) {
+    $saleItems[$it['sale_ID']][] = [
+        'name'     => preg_replace('/^\[Deleted\]\s*/', '', $it['product_name']),
+        'qty'      => (int)$it['quantity'],
+        'price'    => number_format($it['price'], 2),
+        'subtotal' => number_format($it['price'] * $it['quantity'], 2),
+    ];
+}
+$stmt4->close();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -76,7 +99,7 @@ $stmt3->close();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>TINDA | Reports</title>
-    <link rel="stylesheet" href="css/style.css?v=4">
+    <link rel="stylesheet" href="css/style.css?v=7">
 </head>
 <body>
 
@@ -170,6 +193,7 @@ $stmt3->close();
                                 <th>Date</th>
                                 <th>Items</th>
                                 <th>Total</th>
+                                <th style="text-align:center;">Details</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -180,10 +204,16 @@ $stmt3->close();
                                         <td data-label="Date"><?php echo date('M j, g:i A', strtotime($s['sale_date'])); ?></td>
                                         <td data-label="Items"><?php echo $s['items']; ?></td>
                                         <td data-label="Total">₱ <?php echo number_format($s['total_amount'], 2); ?></td>
+                                        <td data-label="Actions" style="text-align:center; white-space:nowrap;">
+                                            <button type="button" class="action-btn edit view-sale"
+                                                    data-sale="<?php echo (int)$s['sale_ID']; ?>"
+                                                    data-date="<?php echo htmlspecialchars(date('M j, Y · g:i A', strtotime($s['sale_date']))); ?>"
+                                                    data-total="₱ <?php echo number_format($s['total_amount'], 2); ?>">View</button>
+                                        </td>
                                     </tr>
                                 <?php endwhile; ?>
                             <?php else: ?>
-                                <tr><td colspan="4" class="empty-row">No sales in this range.</td></tr>
+                                <tr><td colspan="5" class="empty-row">No sales in this range.</td></tr>
                             <?php endif; ?>
                         </tbody>
                     </table>
@@ -213,6 +243,81 @@ $stmt3->close();
     </main>
 
     <?php include 'includes/footer.php'; ?>
+
+    <!-- SALE DETAILS POPUP -->
+    <div id="sale-modal" class="modal-overlay">
+        <div class="modal-card receipt" role="dialog" aria-modal="true" aria-labelledby="sale-modal-title">
+            <h3 id="sale-modal-title">Sale</h3>
+            <div class="receipt-date" id="sale-modal-date"></div>
+            <div class="receipt-items" id="sale-modal-items"></div>
+            <div class="receipt-total">
+                <span>Total</span>
+                <strong id="sale-modal-total"></strong>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-primary" id="sale-modal-close">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    (function () {
+        var saleItems = <?php echo json_encode($saleItems, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>;
+
+        var modal   = document.getElementById('sale-modal');
+        var titleEl = document.getElementById('sale-modal-title');
+        var dateEl  = document.getElementById('sale-modal-date');
+        var itemsEl = document.getElementById('sale-modal-items');
+        var totalEl = document.getElementById('sale-modal-total');
+
+        function el(cls, text) {
+            var d = document.createElement('div');
+            if (cls) d.className = cls;
+            if (text !== undefined) d.textContent = text;
+            return d;
+        }
+
+        function openSale(btn) {
+            var id = btn.dataset.sale;
+            var items = saleItems[id] || [];
+
+            titleEl.textContent = 'Sale #' + id;
+            dateEl.textContent  = btn.dataset.date;
+            totalEl.textContent = btn.dataset.total;
+            itemsEl.textContent = '';
+
+            if (!items.length) {
+                itemsEl.appendChild(el('receipt-empty', 'No item details for this sale.'));
+            }
+
+            items.forEach(function (it) {
+                var row  = el('receipt-item');
+                var left = el();
+                left.appendChild(el('receipt-item-name', it.name));
+                left.appendChild(el('receipt-item-meta', it.qty + ' × ₱' + it.price));
+                row.appendChild(left);
+                row.appendChild(el('receipt-item-sub', '₱' + it.subtotal));
+                itemsEl.appendChild(row);
+            });
+
+            modal.classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeSale() {
+            modal.classList.remove('show');
+            document.body.style.overflow = '';
+        }
+
+        document.addEventListener('click', function (e) {
+            var btn = e.target.closest('.view-sale');
+            if (btn) openSale(btn);
+        });
+        document.getElementById('sale-modal-close').addEventListener('click', closeSale);
+        modal.addEventListener('click', function (e) { if (e.target === modal) closeSale(); });
+        document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeSale(); });
+    })();
+    </script>
 
 </body>
 </html>
