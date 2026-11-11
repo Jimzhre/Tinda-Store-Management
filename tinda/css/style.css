@@ -965,9 +965,9 @@ nav a.active:hover {
     .modal-actions .btn { font-size: 17px; }
     #toast-container { top: 80px; left: 12px; right: 12px; }
     .toast { font-size: 16px; }
-    .site-footer { padding: 24px 16px; }
-    .site-footer p { font-size: 15px; }
-    .footer-small { font-size: 14px; }
+    .site-footer { padding: 26px 8px; flex-direction: column; justify-content: center; align-items: center; text-align: center; gap: 5px;}
+    .site-footer p { font-size: 12px; }
+    .footer-small { font-size: 8px; }
 
     /* Login / Register */
     .auth-body { padding: 50px; }
