@@ -38,10 +38,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 ?>
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>TINDA | Login</title>
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/style.css?v=5">
 </head>
 <body class="auth-body">
 
@@ -58,7 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <p class="auth-sub">Log in to manage your store.</p>
 
         <?php if ($error): ?>
-            <div class="alert error" style="margin-bottom: 20px; padding: 10px; font-size: 13px;"><?php echo $error; ?></div>
+            <div class="alert error"><?php echo $error; ?></div>
         <?php endif; ?>
 
         <form method="POST" action="login.php">
@@ -68,7 +70,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <label>Password</label>
             <input type="password" name="password" required>
 
-            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 24px;">Log In</button>
+            <button type="submit" class="btn btn-primary">Log In</button>
         </form>
 
         <div class="auth-footer">

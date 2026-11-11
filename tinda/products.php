@@ -23,7 +23,6 @@ if (isset($_GET['delete'])) {
         $stmt->execute();
         $stmt->close();
     }
-    }
     $check->close();
 
     $message = "Product removed and moved to archive.";
@@ -91,10 +90,12 @@ $stmt->execute();
 $deletedProducts = $stmt->get_result();
 ?>
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>TINDA | Products</title>
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/style.css?v=4">
 </head>
 <body>
 
@@ -184,9 +185,7 @@ $deletedProducts = $stmt->get_result();
                                     <tr>
                                         <td data-label="Name">
                                             <?php echo htmlspecialchars($p['product_name']); ?>
-                                            <span style="display:block; font-size:11px; color:#88907F; font-weight:normal;">
-                                                <?php echo htmlspecialchars($p['category_name'] ?? '—'); ?>
-                                            </span>
+                                            <span class="cell-sub"><?php echo htmlspecialchars($p['category_name'] ?? '—'); ?></span>
                                         </td>
                                         <td data-label="Price">₱ <?php echo number_format($p['price'], 2); ?></td>
                                         <td data-label="Stock"><?php echo $p['stock_quantity']; ?></td>
@@ -222,9 +221,9 @@ $deletedProducts = $stmt->get_result();
                         <?php if ($deletedProducts->num_rows > 0): ?>
                             <?php while ($dp = $deletedProducts->fetch_assoc()): ?>
                                 <tr>
-                                    <td class="deleted-product"><?php echo htmlspecialchars($dp['product_name']); ?></td>
-                                    <td>₱ <?php echo number_format($dp['price'], 2); ?></td>
-                                    <td>0</td>
+                                    <td data-label="Name" class="deleted-product"><?php echo htmlspecialchars($dp['product_name']); ?></td>
+                                    <td data-label="Price">₱ <?php echo number_format($dp['price'], 2); ?></td>
+                                    <td data-label="Stock">0</td>
                                 </tr>
                             <?php endwhile; ?>
                         <?php else: ?>

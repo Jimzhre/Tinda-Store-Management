@@ -24,7 +24,7 @@ if (!isset($showNav)) {
 ?>
 
 <header>
-    <a href="index.php" style="text-decoration: none; color: inherit;">
+    <a href="index.php" class="logo-link">
         <h1>TINDA<span>.</span></h1>
     </a>
 
@@ -40,7 +40,7 @@ if (!isset($showNav)) {
             <a href="products.php" class="<?php echo $current_page == 'products.php' ? 'active' : ''; ?>">Products</a>
             <a href="reports.php" class="<?php echo $current_page == 'reports.php' ? 'active' : ''; ?>">Reports</a>
             
-            <a href="logout.php" style="color: var(--highlight); margin-left: 10px;">Logout (<?php echo htmlspecialchars($_SESSION['username'] ?? 'User'); ?>)</a>
+            <a href="logout.php" class="nav-logout">Logout (<?php echo htmlspecialchars($_SESSION['username'] ?? 'User'); ?>)</a>
         <?php else: ?>
             <!-- Only show this if logged out -->
             <a href="login.php" class="<?php echo $current_page == 'login.php' ? 'active' : ''; ?>">Log In</a>
@@ -48,3 +48,8 @@ if (!isset($showNav)) {
     </nav>
     <?php endif; ?>
 </header>
+
+<?php if ($showNav): ?>
+    <!-- Adds the phone menu button (3 lines) that slides the menu in and out -->
+    <script src="js/menu.js?v=2"></script>
+<?php endif; ?>

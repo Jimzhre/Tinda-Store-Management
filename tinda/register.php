@@ -38,10 +38,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 ?>
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>TINDA | Create Account</title>
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/style.css?v=5">
 </head>
 <body class="auth-body">
 
@@ -55,13 +57,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <p class="auth-sub">Set up your store owner profile.</p>
 
         <?php if ($error): ?>
-            <div class="alert error" style="margin-bottom: 20px; padding: 10px; font-size: 13px;"><?php echo $error; ?></div>
+            <div class="alert error"><?php echo $error; ?></div>
         <?php endif; ?>
         
         <?php if ($success): ?>
-            <div class="alert success" style="margin-bottom: 20px; padding: 15px; font-size: 14px; text-align: center;">
+            <div class="alert success">
                 <?php echo $success; ?>
-                <p style="margin-top: 8px; font-size: 12px; color: #686D63;">Redirecting you to the login page...</p>
+                <p class="alert-sub">Redirecting you to the login page...</p>
             </div>
             
             <!-- This automatically redirects to the login page after 2 seconds -->
@@ -78,7 +80,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <label>Password</label>
             <input type="password" name="password" required>
 
-            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 24px;">Sign Up</button>
+            <button type="submit" class="btn btn-primary">Sign Up</button>
         </form>
 
         <div class="auth-footer">

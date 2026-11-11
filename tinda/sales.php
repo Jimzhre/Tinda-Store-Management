@@ -79,10 +79,12 @@ $recent = $stmt->get_result();
 ?>
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>TINDA | Sales</title>
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/style.css?v=4">
 </head>
 <body>
 
@@ -100,9 +102,9 @@ $recent = $stmt->get_result();
         <?php if ($message): ?>
             <script>
                 document.addEventListener('DOMContentLoaded', () => {
-                showToast('<?php echo addslashes($message); ?>', '<?php echo $messageType; ?>');
-            });
-        </script>
+                    showToast('<?php echo addslashes($message); ?>', '<?php echo $messageType; ?>');
+                });
+            </script>
         <?php endif; ?>
 
         <div class="products-layout">

@@ -2,6 +2,8 @@
 session_start();
 include 'config/database.php';
 
+$userId = $_SESSION['user_id']; // Get the logged-in user (this line was missing)
+
 $stmt = $conn->prepare("
     SELECT p.product_ID, p.product_name, p.price, p.stock_quantity,
             p.low_stock_threshold, c.category_name
@@ -15,10 +17,12 @@ $stmt->execute();
 $products = $stmt->get_result();
 ?>
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>TINDA | Inventory</title>
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/style.css?v=4">
 </head>
 <body>
 

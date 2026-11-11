@@ -71,10 +71,12 @@ $topProducts = $stmt3->get_result();
 $stmt3->close();
 ?>
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>TINDA | Reports</title>
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/style.css?v=4">
 </head>
 <body>
 
@@ -174,10 +176,10 @@ $stmt3->close();
                             <?php if ($sales->num_rows > 0): ?>
                                 <?php while ($s = $sales->fetch_assoc()): ?>
                                     <tr>
-                                        <td>#<?php echo $s['sale_ID']; ?></td>
-                                        <td><?php echo date('M j, g:i A', strtotime($s['sale_date'])); ?></td>
-                                        <td><?php echo $s['items']; ?></td>
-                                        <td>₱ <?php echo number_format($s['total_amount'], 2); ?></td>
+                                        <td data-label="Sale #">#<?php echo $s['sale_ID']; ?></td>
+                                        <td data-label="Date"><?php echo date('M j, g:i A', strtotime($s['sale_date'])); ?></td>
+                                        <td data-label="Items"><?php echo $s['items']; ?></td>
+                                        <td data-label="Total">₱ <?php echo number_format($s['total_amount'], 2); ?></td>
                                     </tr>
                                 <?php endwhile; ?>
                             <?php else: ?>
