@@ -45,5 +45,11 @@ CREATE TABLE IF NOT EXISTS Sale_Details (
     FOREIGN KEY (product_ID) REFERENCES Products(product_ID)
 );
 
-INSERT INTO Categories (category_name) VALUES
-    ('Snacks'), ('Beverages'), ('Canned Goods'), ('Household'), ('Personal Care');
+INSERT INTO `categories` (`category_ID`, `category_name`) VALUES
+(1, 'Beverages'),
+(2, 'Canned & Dry Goods'),
+(3, 'Condiments'),
+(4, 'Household'),
+(5, 'Medicine'),
+(6, 'Personal Care'),
+(7, 'Snacks & Chips');
