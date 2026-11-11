@@ -20,9 +20,9 @@ if (isset($_GET['delete'])) {
         $newName = '[Deleted] ' . $res['product_name'];
         $stmt = $conn->prepare("UPDATE Products SET product_name = ?, stock_quantity = 0 WHERE product_ID = ? AND user_ID = ?");
         $stmt->bind_param("sii", $newName, $id, $_SESSION['user_id']);
-        $stmt->bind_param("si", $newName, $id);
         $stmt->execute();
         $stmt->close();
+    }
     }
     $check->close();
 
