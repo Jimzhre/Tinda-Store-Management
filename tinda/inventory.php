@@ -2,13 +2,12 @@
 session_start();
 include 'config/database.php';
 
-$userId = $_SESSION['user_id'];
 $stmt = $conn->prepare("
     SELECT p.product_ID, p.product_name, p.price, p.stock_quantity,
             p.low_stock_threshold, c.category_name
     FROM Products p
     LEFT JOIN Categories c ON p.category_ID = c.category_ID
-    WHERE p.user_ID = ?
+    WHERE p.user_ID = ? AND p.product_name NOT LIKE '[Deleted]%'
     ORDER BY p.product_name
 ");
 $stmt->bind_param("i", $userId);

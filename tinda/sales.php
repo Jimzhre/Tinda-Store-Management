@@ -66,7 +66,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // Products for dropdown (ONLY this user's products)
-$stmt = $conn->prepare("SELECT product_ID, product_name, price, stock_quantity FROM Products WHERE stock_quantity > 0 AND user_ID = ? ORDER BY product_name");
+$stmt = $conn->prepare("SELECT product_ID, product_name, price, stock_quantity FROM Products WHERE stock_quantity > 0 AND user_ID = ? AND product_name NOT LIKE '[Deleted]%' ORDER BY product_name");
 $stmt->bind_param("i", $userId);
 $stmt->execute();
 $products = $stmt->get_result();
