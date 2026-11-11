@@ -102,6 +102,10 @@ nav a.active:hover {
     background-color: #E3C782;
 }
 
+/* Logo link & logout link (moved out of inline styles in header.php) */
+.logo-link { text-decoration: none; color: inherit; }
+.nav-logout { color: var(--highlight); margin-left: 10px; }
+
 /* ===== 3. BUTTONS ===== */
 .btn {
     display: inline-block;
@@ -327,6 +331,9 @@ nav a.active:hover {
 .stat-card-value { font-size: clamp(20px, 4vw, 30px); font-weight: 800; color: var(--dark-green); letter-spacing: -1px; line-height: 1; }
 .stat-card-sub { font-size: 12px; color: #88907F; margin-top: 4px; font-weight: 600; }
 
+/* Quick Actions heading */
+.quick-actions h3 { font-size: 13px; color: var(--dark-green); text-transform: uppercase; letter-spacing: 1.2px; font-weight: 800; margin-bottom: 16px; }
+
 /* Action Cards */
 .action-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: var(--space-2); margin-bottom: var(--space-5); }
 .action-card { background-color: var(--white); border: 1px solid #EFEBDE; border-radius: var(--radius); padding: 26px 20px; text-align: center; text-decoration: none; color: var(--dark-green); transition: all 0.3s ease; display: flex; flex-direction: column; align-items: center; gap: 14px; position: relative; overflow: hidden; }
@@ -354,6 +361,9 @@ nav a.active:hover {
 .data-table tbody tr:last-child td { border-bottom: none; }
 .data-table td:first-child { font-weight: 600; color: var(--dark-green); }
 .empty-row { text-align: center; color: #88907F; padding: 50px 20px !important; font-style: italic; font-size: 14px; }
+
+/* Small grey text under a table cell value (e.g. category under product name) */
+.cell-sub { display: block; font-size: 11px; color: #88907F; font-weight: normal; }
 
 /* Badges */
 .badge { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 20px; font-size: 11px; font-weight: 800; letter-spacing: 0.5px; text-transform: uppercase; }
@@ -389,6 +399,18 @@ nav a.active:hover {
 .form-card input:focus, .form-card select:focus { outline: none; border-color: var(--primary); background-color: #fff; box-shadow: 0 0 0 4px rgba(130, 152, 121, 0.14); }
 .form-card button[type="submit"] { margin-top: 26px; width: 100%; border: none; cursor: pointer; font-family: inherit; padding: 14px 24px; font-size: 15px; font-weight: 800; border-radius: 12px; background: linear-gradient(135deg, var(--primary), #6B8361); color: var(--white); transition: all 0.25s ease; letter-spacing: 0.2px; }
 .form-card button[type="submit"]:hover { transform: translateY(-2px); box-shadow: 0 10px 22px rgba(53, 79, 60, 0.2); }
+/* Multi-item sale rows */
+.sale-rows { display: flex; flex-direction: column; gap: 12px; }
+.sale-row { display: grid; grid-template-columns: 1fr 52px; gap: 12px; align-items: end; padding: 16px; border: 1.5px solid #E6E2D5; border-radius: 14px; background-color: #FBF9F2; }
+.form-card .sale-row label { margin: 0 0 8px; }
+.sale-row-product { grid-column: 1 / -1; }
+.sale-row input, .sale-row select { background-color: var(--white); }
+.sale-row-remove { height: 50px; border: none; border-radius: 12px; background-color: #FBE6DD; color: #A5452A; font-size: 18px; font-weight: 800; cursor: pointer; transition: 0.2s; }
+.sale-row-remove:hover { background-color: var(--accent); color: var(--white); }
+.sale-rows.single .sale-row-remove { visibility: hidden; }
+#add-row { width: 100%; margin-top: 14px; text-align: center; }
+.sale-total { display: flex; justify-content: space-between; align-items: center; margin-top: 18px; padding: 14px 18px; border-radius: 12px; background-color: #F8F5EA; color: var(--dark-green); font-size: 13px; font-weight: 800; letter-spacing: 0.5px; text-transform: uppercase; }
+.sale-total strong { font-size: 22px; letter-spacing: -0.5px; }
 
 /* ===== 9. REPORTS (FILTER BAR) ===== */
 .filter-bar { background-color: var(--white); border-radius: var(--radius); padding: 22px 26px; margin-bottom: var(--space-2); box-shadow: var(--shadow-sm); border: 1px solid #EFEBDE; }
@@ -591,6 +613,17 @@ nav a.active:hover {
     box-shadow: 0 0 0 4px rgba(130, 152, 121, 0.14);
 }
 
+.auth-card button.btn {
+    width: 100%;
+    margin-top: 24px;
+}
+
+/* Alert boxes (login / register messages) */
+.alert { margin-bottom: 20px; padding: 12px 16px; border-radius: 10px; font-size: 14px; font-weight: 600; line-height: 1.5; }
+.alert.error { background-color: #FBE6DD; color: #A5452A; border: 1px solid #F0C9B8; }
+.alert.success { background-color: #E6F1E5; color: #2F5F3C; border: 1px solid #CFE3CD; text-align: center; padding: 16px; }
+.alert-sub { margin-top: 8px; font-size: 13px; font-weight: normal; color: #686D63; }
+
 .auth-footer {
     text-align: center;
     margin-top: 24px;
@@ -777,289 +810,288 @@ nav a.active:hover {
     }
 
     .action-btn {
-        padding: 6px 8px !important;
-        font-size: 11px !important;
+        padding: 7px 10px !important;
+        font-size: 12px !important;
         display: inline-block;
-        margin-bottom: 4px;
+        margin-bottom: 0 !important;
+        white-space: nowrap;
     }
+
+    /* Keep Edit and Delete on ONE line (not stacked up and down) */
+    .data-table td[data-label="Actions"] {
+        white-space: nowrap !important;
+    }
+
+    /* Header: logo on the left, menu next to it on the same row */
+    header { flex-wrap: nowrap; padding: 14px 20px; gap: 12px; }
+    header h1 { font-size: 26px; white-space: nowrap; }
+    nav { flex: 1; min-width: 0; justify-content: flex-end; flex-wrap: wrap; gap: 2px; }
+    nav a { font-size: 13px; padding: 8px 9px; white-space: nowrap; }
+    .nav-logout { margin-left: 4px; max-width: 170px; overflow: hidden; text-overflow: ellipsis; }
 }
 
-/* ===== 2. PHONES (320px to 767px) ===== */
+/* ===== 2. PHONES (up to 767px) =====
+   Same design and layout as desktop, just bigger so it's easy to read.
+   Only things that physically can't fit side by side on a phone are stacked. */
 @media (max-width: 767px) {
-    body {
-        font-size: 16px !important; 
-    }
 
-    .landing {
-        padding: 0 !important;
-        margin: 0 !important;
-        max-width: 100% !important;
-    }
+    /* Header & nav */
 
-    .hero {
-        min-height: calc(100vh - 60px) !important;
-        padding: 30px 16px !important; 
-        display: flex !important;
-        align-items: center !important;
-        justify-content: flex-start !important;
-        width: 100% !important;
-        overflow: visible !important;
-    }
+    /* Homepage */
+    .landing { padding: 20px 16px 60px; }
+    .hero { min-height: 85vh; padding: 20px 0 50px; }
+    .eyebrow { font-size: 16px; }
+    .hero h2 { font-size: clamp(52px, 15vw, 72px); }
+    .hero-desc { font-size: 20px; max-width: 100%; }
+    .hero-buttons .btn { padding: 20px 40px; font-size: 20px; }
+    .hero-note { font-size: 17px; }
 
-    .hero-inner {
-        width: 100% !important;
-        max-width: 100% !important;
-        margin: 0 !important;
-        transform: none !important; 
-        opacity: 1 !important;
-    }
+    .stats { grid-template-columns: repeat(2, 1fr); padding: 28px 16px; }
+    .stat-num { font-size: 44px; }
+    .stat-label { font-size: 16px; }
 
-    .hero h2 {
-        font-size: 56px !important; 
-        line-height: 1.1 !important;
-        letter-spacing: -2px !important;
-        margin-bottom: 24px !important;
-    }
-    
-    .hero-desc {
-        font-size: 18px !important;
-        line-height: 1.6 !important;
-        margin-bottom: 32px !important;
-        max-width: 100% !important;
-    }
+    .features h3, .how h3, .why-text h3 { font-size: 34px; }
+    .section-sub { font-size: 18px; }
+    .feature-icon { font-size: 38px; }
+    .feature-card h4, .how-step h4 { font-size: 22px; }
+    .feature-card p, .how-step p { font-size: 17px; }
+    .how-num { width: 44px; height: 44px; font-size: 20px; }
 
-    .hero-note {
-        font-size: 15px !important; 
-    }
+    .why { grid-template-columns: 1fr; }
+    .check-list li { font-size: 18px; }
+    .check { width: 26px; height: 26px; font-size: 15px; }
+    .why-card h4 { font-size: 24px; }
+    .why-card p { font-size: 17px; }
 
-    .hero-buttons {
-        flex-direction: column !important;
-        width: 100% !important;
-        gap: 14px !important;
-    }
-    
-    .hero-buttons .btn {
-        width: 100% !important;
-        text-align: center !important;
-        padding: 18px 20px !important; 
-        font-size: 18px !important; 
-    }
+    .cta { padding: 36px 20px; }
+    .cta h3 { font-size: 30px; }
+    .cta p { font-size: 18px; }
+    .btn { font-size: 18px; padding: 15px 28px; }
 
-    .dashboard {
-        padding: 20px 16px !important;
-    }
+    /* Dashboard & page headings */
+    .dashboard { padding: 24px 16px; }
+    .page-head h2 { font-size: 38px; }
+    .page-head p { font-size: 17px; }
+    .page-head .btn { width: 100%; text-align: center; }
 
-    .feature-grid, 
-    .how-grid, 
-    .stats {
-        grid-template-columns: 1fr !important; 
-        gap: 16px !important;
-    }
+    .welcome-banner { padding: 28px 24px; }
+    .banner-eyebrow { font-size: 14px; }
+    .welcome-banner h3 { font-size: 30px; }
+    .welcome-banner p { font-size: 17px; }
+    .banner-actions { width: 100%; flex-direction: column; }
+    .banner-actions .btn { width: 100%; text-align: center; }
 
-    .feature-card, 
-    .how-step {
-        width: 100% !important;
-        padding: 24px 20px !important;
+    /* Cards */
+    .stat-card-icon { width: 68px; height: 68px; font-size: 32px; }
+    .stat-card-label { font-size: 14px; }
+    .stat-card-value { font-size: 30px; overflow-wrap: anywhere; }
+    .stat-card-sub { font-size: 15px; }
+
+    /* Quick actions: one wide, thumb-friendly row per action */
+    .quick-actions h3 { font-size: 15px; }
+    .action-grid { grid-template-columns: 1fr; gap: 12px; }
+    .action-card { flex-direction: row; justify-content: flex-start; text-align: left; padding: 16px 20px; gap: 18px; }
+    .action-icon { width: 56px; height: 56px; font-size: 28px; flex-shrink: 0; }
+    .action-label { font-size: 19px; }
+
+    /* Lists & tables: each row becomes a readable card (uses the data-label on every cell) */
+    .list-card > h3,
+    .list-card .recent-head h3 { font-size: 16px; }
+    .list-card .recent-head .link { font-size: 13px; padding: 6px 12px; }
+    .data-table { min-width: 0; display: block; }
+    .data-table thead { display: none; }
+    .data-table tbody,
+    .data-table tr { display: block; width: 100%; }
+    .data-table tbody tr:hover { background-color: transparent; }
+    .data-table tr { padding: 16px 20px; border-bottom: 1px solid #F1EEE1; }
+    .data-table tbody tr:last-child { border-bottom: none; }
+    .data-table td {
+        display: flex; justify-content: space-between; align-items: center; gap: 16px;
+        width: 100%; padding: 10px 0; border: none;
+        text-align: right; font-size: 17px;
     }
+    .data-table td::before {
+        content: attr(data-label);
+        font-size: 13px; font-weight: 800; color: #88907F;
+        text-transform: uppercase; letter-spacing: 0.5px;
+        text-align: left; flex-shrink: 0;
+    }
+    /* First cell = the card title */
+    .data-table td:first-child {
+        display: block; text-align: left;
+        font-size: 19px; font-weight: 800;
+        padding-bottom: 12px; margin-bottom: 6px;
+        border-bottom: 1px solid #F1EEE1;
+    }
+    .data-table td:first-child::before { display: none; }
+    .cell-sub { font-size: 14px; margin-top: 4px; }
+    /* Edit / Delete buttons: two big buttons side by side */
+    .data-table td[data-label="Actions"] { gap: 12px; padding-top: 14px; }
+    .data-table td[data-label="Actions"]::before { display: none; }
+    .data-table td[data-label="Actions"] .action-btn { flex: 1; text-align: center; margin: 0; padding: 13px 10px; font-size: 16px; }
+    /* "No data" message */
+    .data-table td.empty-row { display: block; text-align: center; border: none; padding: 40px 10px !important; }
+    .data-table td.empty-row::before { display: none; }
+    .badge { font-size: 13px; padding: 7px 14px; }
+    .action-btn { font-size: 15px; padding: 9px 16px; }
+    .top-rank { width: 36px; height: 36px; font-size: 16px; }
+    .top-name { font-size: 18px; }
+    .top-count { font-size: 15px; padding: 6px 12px; white-space: nowrap; }
+    .empty-row { font-size: 17px; }
+
+    /* Things that cannot sit side by side on a phone */
+    .dash-lower,
+    .products-layout { grid-template-columns: 1fr; }
+
+    /* Forms */
+    .form-card { padding: 28px 20px; }
+    .form-card h3 { font-size: 22px; }
+    .form-card label { font-size: 15px; }
+    .form-card input,
+    .form-card select { font-size: 17px; padding: 16px; }
+    .form-card button[type="submit"] { font-size: 19px; padding: 18px; }
+
+    /* Reports filter */
+    .filter-bar { padding: 22px 18px; }
+    .filter-group { width: 100%; }
+    .filter-field { flex: 1 1 100%; }
+    .filter-field label { font-size: 14px; }
+    .filter-field input[type="date"] { font-size: 17px; padding: 14px 16px; min-width: 0; width: 100%; }
+    .filter-field + .filter-field::before { display: none; }
+    .filter-actions { margin-left: 0; width: 100%; }
+    .filter-actions .btn,
+    .filter-actions .btn-primary,
+    .filter-actions .btn-outline { flex: 1; font-size: 18px; padding: 15px; text-align: center; }
+    .range-summary { font-size: 17px; flex-direction: column; align-items: flex-start; }
+    .range-totals { font-size: 18px; }
+
+    /* Chart */
+    .chart-container { height: 250px; padding: 44px 14px 10px; gap: 6px; }
+    .chart-bar-wrap { min-width: 0; }
+    .chart-label { font-size: 13px; }
+    .chart-tooltip { font-size: 14px; }
+
+    /* Modal, toast, footer */
+    .modal-card h3 { font-size: 26px; }
+    .modal-card p { font-size: 17px; }
+    .modal-actions .btn { font-size: 17px; }
+    #toast-container { top: 80px; left: 12px; right: 12px; }
+    .toast { font-size: 16px; }
+    .site-footer { padding: 26px 8px; flex-direction: column; justify-content: center; align-items: center; text-align: center; gap: 5px;}
+    .site-footer p { font-size: 12px; }
+    .footer-small { font-size: 8px; }
+
+    /* Login / Register */
+    .auth-body { padding: 50px; }
+    .auth-card { padding: 20px 15px; border-radius: 18px; }
+    .auth-header { margin-bottom: 25px; }
+    .auth-header h1 { font-size: 32px; }
+    .auth-header p { font-size: 16px; }
+    .auth-card h2 { font-size: 22px; }
+    .auth-sub { font-size: 12px; margin-bottom: 18px; }
+    .auth-card label { font-size: 12px; margin: 16px 0 8px; }
+    .auth-card input { font-size: 11px; padding: 13px 18px; }
+    .auth-card button.btn { font-size: 16px; padding: 14px; margin-top: 22px; }
+    .auth-footer { font-size: 15px; margin-top: 26px; }
+    .back-home { font-size: 13px; margin-bottom: 20px; }
+    .alert { font-size: 13px; }
+    .alert-sub { font-size: 12px; }
+}
+
+/* ============================================
+   3. MENU BUTTON + SLIDE-IN MENU (phones only, up to 767px)
+   The button is created by js/menu.js. On desktop it stays hidden.
+   ============================================ */
+.nav-toggle,
+.nav-overlay { display: none; }
+
+@media (max-width: 767px) {
 
     header {
-        flex-direction: column !important;
-        align-items: flex-start !important;
-        gap: 12px !important;
-        padding: 16px !important;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 12px 20px;
     }
-    
+    header h1 { font-size: 26px; }
+
+    /* The menu button (3 lines -> X) */
+    .nav-toggle {
+        display: inline-flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+        width: 46px;
+        height: 46px;
+        padding: 0;
+        border: none;
+        border-radius: 12px;
+        background-color: rgba(255, 255, 255, 0.12);
+        cursor: pointer;
+        position: relative;
+        z-index: 1002;
+    }
+    .nav-toggle span {
+        display: block;
+        width: 22px;
+        height: 2.5px;
+        border-radius: 2px;
+        background-color: var(--white);
+        transition: transform 0.3s ease, opacity 0.2s ease;
+    }
+    .nav-toggle.open span:nth-child(1) { transform: translateY(7.5px) rotate(45deg); }
+    .nav-toggle.open span:nth-child(2) { opacity: 0; }
+    .nav-toggle.open span:nth-child(3) { transform: translateY(-7.5px) rotate(-45deg); }
+
+    /* Dark background behind the open menu */
+    .nav-overlay {
+        display: block;
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background-color: rgba(30, 45, 34, 0.55);
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s ease, visibility 0.3s ease;
+        z-index: 1000;
+    }
+    .nav-overlay.show { opacity: 1; visibility: visible; }
+
+    /* The menu itself slides in from the right */
     nav {
-        width: 100% !important;
-        justify-content: flex-start !important;
-        overflow-x: auto !important;
-        padding-bottom: 5px !important;
-        -ms-overflow-style: none !important;  
-        scrollbar-width: none !important;  
+        position: fixed;
+        top: 0; right: 0; bottom: 0;
+        width: min(82vw, 320px);
+        flex-direction: column;
+        flex-wrap: nowrap;
+        align-items: stretch;
+        justify-content: flex-start;
+        gap: 6px;
+        padding: 84px 20px 24px;
+        overflow-y: auto;
+        background: linear-gradient(160deg, #2E4534 0%, #354F3C 100%);
+        box-shadow: -12px 0 40px rgba(0, 0, 0, 0.25);
+        transform: translateX(105%);
+        visibility: hidden;
+        transition: transform 0.35s ease, visibility 0.35s ease;
+        z-index: 1001;
     }
-    nav::-webkit-scrollbar { display: none !important; }
-    
-    nav a {
-        white-space: nowrap !important;
-        font-size: 13px !important;
-        padding: 8px 12px !important;
-    }
+    nav.open { transform: translateX(0); visibility: visible; }
+    nav a { font-size: 19px; padding: 15px 18px; border-radius: 12px; }
+    .nav-logout { margin-left: 0; max-width: none; }
 
-    .page-head {
-        flex-direction: column !important;
-        align-items: flex-start !important;
-        gap: 12px !important;
-    }
-    
-    .page-head h2 {
-        font-size: 32px !important; 
-        margin-bottom: 8px !important;
-    }
-    
-    .page-head p {
-        font-size: 15px !important;
-    }
+    body.menu-open { overflow: hidden; }
 
-    .stat-cards {
-        grid-template-columns: 1fr !important; 
-    }
-    
-    .products-layout, 
-    .dash-lower {
-        grid-template-columns: 1fr !important; 
-    }
+    .sale-row { padding: 18px; }
+    .sale-row-remove { height: 56px; }
+    .sale-total { font-size: 15px; }
+    .sale-total strong { font-size: 26px; }
+    #add-row { font-size: 18px; padding: 15px; }
+}
 
-    .form-card, .list-card, .stat-card {
-        padding: 20px 16px !important;
-        border-radius: 14px !important;
-    }
-    
-    .stat-card {
-        padding: 24px 20px !important;
-        gap: 16px !important;
-    }
-    
-    .stat-card-icon {
-        width: 60px !important;
-        height: 60px !important;
-        font-size: 28px !important;
-    }
-
-    .stat-card-value {
-        font-size: 32px !important; 
-    }
-    
-    .stat-card-label {
-        font-size: 13px !important; 
-    }
-
-    .welcome-banner {
-        padding: 24px !important;
-    }
-    
-    .banner-actions {
-        width: 100% !important;
-        flex-direction: column !important;
-    }
-    
-    .banner-actions .btn {
-        width: 100% !important;
-        text-align: center !important;
-    }
-
-    /* Tables */
-    .table-wrap {
-        overflow-x: hidden !important;
-        width: 100% !important;
-        max-width: 100% !important;
-        display: block !important;
-        box-shadow: none !important;
-        border: none !important;
-        background-color: transparent !important;
-        border-radius: 0 0 18px 18px !important;
-    }
-
-    .data-table {
-        width: 100% !important;
-        min-width: 0 !important;
-        display: block !important;
-    }
-
-    .data-table thead {
-        display: none !important; 
-    }
-    
-    .data-table tbody, 
-    .data-table tr, 
-    .data-table td {
-        display: block !important;
-        width: 100% !important;
-    }
-    
-    .data-table tr {
-        margin-bottom: 20px !important;
-        border: 1px solid #EFEBDE !important;
-        border-radius: 12px !important;
-        padding: 16px !important;
-        background-color: var(--white) !important;
-        box-shadow: 0 2px 8px rgba(53, 79, 60, 0.04) !important;
-    }
-    
-    .data-table td {
-        border: none !important;
-        padding: 12px 0 !important;
-        display: flex !important;
-        justify-content: space-between !important;
-        align-items: center !important;
-        text-align: right !important;
-        font-size: 15px !important; 
-        box-sizing: border-box !important;
-        white-space: normal !important; 
-        word-wrap: break-word !important;
-    }
-    
-    .data-table td::before {
-        content: attr(data-label) !important;
-        font-weight: 800 !important;
-        color: #88907F !important;
-        font-size: 12px !important;
-        text-transform: uppercase !important;
-        letter-spacing: 0.5px !important;
-        text-align: left !important;
-        padding-right: 15px !important;
-    }
-    
-    .data-table td:first-child {
-        border-bottom: 1px solid #F1EEE1 !important;
-        padding-bottom: 14px !important;
-        margin-bottom: 8px !important;
-        font-weight: 800 !important; 
-        color: var(--dark-green) !important;
-        font-size: 17px !important;
-    }
-    
-    .data-table td.empty-row::before {
-        content: none !important; 
-    }
-
-    .form-card label {
-        font-size: 14px !important;
-    }
-    .form-card input, 
-    .form-card select {
-        padding: 16px !important;
-        font-size: 16px !important;
-    }
-    .form-card button[type="submit"] {
-        padding: 18px !important;
-        font-size: 18px !important;
-    }
-
-    .filter-field label {
-        font-size: 13px !important;
-    }
-    .filter-field input[type="date"] {
-        padding: 14px 16px !important;
-        font-size: 16px !important;
-    }
-    .filter-actions .btn {
-        padding: 16px !important;
-        font-size: 16px !important;
-    }
-
-    .action-btn {
-        padding: 10px 16px !important;
-        font-size: 14px !important;
-    }
-
-    .chart-container {
-        overflow-x: auto !important;
-        padding: 15px 10px !important;
-        gap: 8px !important;
-        height: 180px !important;
-    }
-    
-    .chart-bar-wrap {
-        min-width: 35px !important;
-    }
+@media (max-width: 767px) {
+    header { padding: 12px 16px; }
+    header h1 { font-size: 24px; }
 }

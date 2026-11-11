@@ -6,32 +6,65 @@ $message = "";
 $messageType = "";
 $userId = $_SESSION['user_id']; // Get the logged-in user
 
-// Handle sale submit
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $productId = (int)($_POST['product_ID'] ?? 0);
-    $qty       = (int)($_POST['quantity'] ?? 0);
+// Rows shown in the form (one empty row by default)
+$formRows = [['product_ID' => 0, 'quantity' => 1]];
 
-    if ($productId <= 0 || $qty <= 0) {
-        $message = "Please choose a product and quantity greater than zero.";
+// Handle sale submit (one sale can have many items)
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $ids  = is_array($_POST['product_ID'] ?? null) ? $_POST['product_ID'] : [];
+    $qtys = is_array($_POST['quantity'] ?? null) ? $_POST['quantity'] : [];
+
+    $formRows = [];   // remembered so the form is refilled if something goes wrong
+    $wanted   = [];   // product_ID => total quantity (same product in 2 rows is combined)
+    $badQty   = false;
+
+    foreach ($ids as $i => $rawId) {
+        $pid = (int)$rawId;
+        $q   = (int)($qtys[$i] ?? 0);
+        $formRows[] = ['product_ID' => $pid, 'quantity' => $q > 0 ? $q : 1];
+
+        if ($pid <= 0) continue;                  // empty row, ignore it
+        if ($q <= 0) { $badQty = true; continue; }
+        $wanted[$pid] = ($wanted[$pid] ?? 0) + $q;
+    }
+    if (!$formRows) {
+        $formRows = [['product_ID' => 0, 'quantity' => 1]];
+    }
+
+    if ($badQty || !$wanted) {
+        $message = "Please choose at least one product and a quantity greater than zero.";
         $messageType = "error";
     } else {
-        // Check stock (ONLY for this user's products)
-        $stmt = $conn->prepare("SELECT product_name, price, stock_quantity FROM Products WHERE product_ID = ? AND user_ID = ?");
-        $stmt->bind_param("ii", $productId, $userId);
-        $stmt->execute();
-        $prod = $stmt->get_result()->fetch_assoc();
-        $stmt->close();
+        // Check every item (ONLY this user's products)
+        $lines = [];
+        $total = 0;
+        $error = "";
 
-        if (!$prod) {
-            $message = "Product not found.";
-            $messageType = "error";
-        } elseif ($prod['stock_quantity'] < $qty) {
-            $message = "Not enough stock. Only " . $prod['stock_quantity'] . " left.";
+        foreach ($wanted as $pid => $qty) {
+            $stmt = $conn->prepare("SELECT product_name, price, stock_quantity FROM Products WHERE product_ID = ? AND user_ID = ?");
+            $stmt->bind_param("ii", $pid, $userId);
+            $stmt->execute();
+            $prod = $stmt->get_result()->fetch_assoc();
+            $stmt->close();
+
+            if (!$prod) {
+                $error = "Product not found.";
+                break;
+            }
+            if ($prod['stock_quantity'] < $qty) {
+                $error = "Not enough stock for " . $prod['product_name'] . ". Only " . $prod['stock_quantity'] . " left.";
+                break;
+            }
+
+            $lines[] = ['id' => $pid, 'name' => $prod['product_name'], 'price' => $prod['price'], 'qty' => $qty];
+            $total += $prod['price'] * $qty;
+        }
+
+        if ($error !== "") {
+            $message = $error;
             $messageType = "error";
         } else {
-            $total = $prod['price'] * $qty;
-
-            // Transaction: insert sale, insert detail, deduct stock
+            // Transaction: ONE sale, a detail row per item, deduct stock per item
             $conn->begin_transaction();
             try {
                 // 1. Insert Sale (with user_ID)
@@ -41,21 +74,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $saleId = $conn->insert_id;
                 $stmt->close();
 
-                // 2. Insert Sale Detail
-                $stmt = $conn->prepare("INSERT INTO Sale_Details (sale_ID, product_ID, quantity, price) VALUES (?, ?, ?, ?)");
-                $stmt->bind_param("iiid", $saleId, $productId, $qty, $prod['price']);
-                $stmt->execute();
-                $stmt->close();
+                $detail = $conn->prepare("INSERT INTO Sale_Details (sale_ID, product_ID, quantity, price) VALUES (?, ?, ?, ?)");
+                $deduct = $conn->prepare("UPDATE Products SET stock_quantity = stock_quantity - ? WHERE product_ID = ? AND user_ID = ? AND stock_quantity >= ?");
 
-                // 3. Deduct Stock
-                $stmt = $conn->prepare("UPDATE Products SET stock_quantity = stock_quantity - ? WHERE product_ID = ? AND user_ID = ?");
-                $stmt->bind_param("iii", $qty, $productId, $userId);
-                $stmt->execute();
-                $stmt->close();
+                foreach ($lines as $l) {
+                    // 2. Insert Sale Detail
+                    $detail->bind_param("iiid", $saleId, $l['id'], $l['qty'], $l['price']);
+                    $detail->execute();
+
+                    // 3. Deduct Stock (only if there is still enough)
+                    $deduct->bind_param("iiii", $l['qty'], $l['id'], $userId, $l['qty']);
+                    $deduct->execute();
+                    if ($deduct->affected_rows < 1) {
+                        throw new Exception("Not enough stock for " . $l['name'] . ".");
+                    }
+                }
+                $detail->close();
+                $deduct->close();
 
                 $conn->commit();
-                $message = "Sale recorded: {$qty} × {$prod['product_name']} — ₱" . number_format($total, 2);
+
+                if (count($lines) === 1) {
+                    $message = "Sale recorded: {$lines[0]['qty']} × {$lines[0]['name']} — ₱" . number_format($total, 2);
+                } else {
+                    $message = "Sale recorded: " . count($lines) . " items — ₱" . number_format($total, 2);
+                }
                 $messageType = "success";
+                $formRows = [['product_ID' => 0, 'quantity' => 1]];   // fresh form
             } catch (Exception $e) {
                 $conn->rollback();
                 $message = "Sale failed: " . $e->getMessage();
@@ -69,7 +114,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $stmt = $conn->prepare("SELECT product_ID, product_name, price, stock_quantity FROM Products WHERE stock_quantity > 0 AND user_ID = ? AND product_name NOT LIKE '[Deleted]%' ORDER BY product_name");
 $stmt->bind_param("i", $userId);
 $stmt->execute();
-$products = $stmt->get_result();
+$productResult = $stmt->get_result();
+$productList = $productResult->fetch_all(MYSQLI_ASSOC);
+$stmt->close();
 
 // Recent sales (ONLY this user's sales)
 $stmt = $conn->prepare("SELECT sale_ID, sale_date, total_amount FROM Sales WHERE user_ID = ? ORDER BY sale_date DESC LIMIT 10");
@@ -84,7 +131,7 @@ $recent = $stmt->get_result();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>TINDA | Sales</title>
-    <link rel="stylesheet" href="css/style.css?v=4">
+    <link rel="stylesheet" href="css/style.css?v=7">
 </head>
 <body>
 
@@ -95,7 +142,7 @@ $recent = $stmt->get_result();
         <section class="page-head">
             <div>
                 <h2>Sales</h2>
-                <p>Record a new sale — stock is deducted automatically.</p>
+                <p>Record a sale with one or more items — stock is deducted automatically.</p>
             </div>
         </section>
 
@@ -114,19 +161,39 @@ $recent = $stmt->get_result();
                 <h3>Record a Sale</h3>
                 <form method="POST" action="sales.php">
 
-                    <label>Product</label>
-                    <select name="product_ID" required>
-                        <option value="">— Choose a product —</option>
-                        <?php while ($p = $products->fetch_assoc()): ?>
-                            <option value="<?php echo $p['product_ID']; ?>">
-                                <?php echo htmlspecialchars($p['product_name']); ?>
-                                (₱<?php echo number_format($p['price'], 2); ?> · <?php echo $p['stock_quantity']; ?> left)
-                            </option>
-                        <?php endwhile; ?>
-                    </select>
+                    <div class="sale-rows" id="sale-rows">
+                        <?php foreach ($formRows as $fr): ?>
+                            <div class="sale-row">
+                                <div class="sale-row-product">
+                                    <label>Product</label>
+                                    <select name="product_ID[]" required>
+                                        <option value="">— Choose a product —</option>
+                                        <?php foreach ($productList as $p): ?>
+                                            <option value="<?php echo $p['product_ID']; ?>"
+                                                    data-price="<?php echo $p['price']; ?>"
+                                                    data-stock="<?php echo $p['stock_quantity']; ?>"
+                                                    <?php echo ((int)$fr['product_ID'] === (int)$p['product_ID']) ? 'selected' : ''; ?>>
+                                                <?php echo htmlspecialchars($p['product_name']); ?>
+                                                (₱<?php echo number_format($p['price'], 2); ?> · <?php echo $p['stock_quantity']; ?> left)
+                                            </option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
+                                <div class="sale-row-qty">
+                                    <label>Quantity</label>
+                                    <input type="number" name="quantity[]" min="1" value="<?php echo (int)$fr['quantity']; ?>" required>
+                                </div>
+                                <button type="button" class="sale-row-remove" aria-label="Remove this item">✕</button>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
 
-                    <label>Quantity</label>
-                    <input type="number" name="quantity" min="1" value="1" required>
+                    <button type="button" class="btn btn-outline" id="add-row">+ Add another item</button>
+
+                    <div class="sale-total">
+                        <span>Total</span>
+                        <strong id="sale-total">₱ 0.00</strong>
+                    </div>
 
                     <button type="submit" class="btn btn-primary">Record Sale</button>
                 </form>
@@ -167,6 +234,63 @@ $recent = $stmt->get_result();
 
     <?php include 'includes/footer.php'; ?>
     <script src="js/toast.js"></script>
+
+    <!-- Add / remove item rows and show the running total -->
+    <script>
+    (function () {
+        var rows    = document.getElementById('sale-rows');
+        var addBtn  = document.getElementById('add-row');
+        var totalEl = document.getElementById('sale-total');
+        if (!rows || !addBtn || !totalEl) return;
+
+        function money(n) {
+            return '₱ ' + n.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
+        function refresh() {
+            var all = rows.querySelectorAll('.sale-row');
+            var total = 0;
+
+            all.forEach(function (row) {
+                var sel = row.querySelector('select');
+                var qty = row.querySelector('input[type="number"]');
+                var opt = sel.options[sel.selectedIndex];
+                var price = opt ? parseFloat(opt.dataset.price || 0) : 0;
+                var stock = opt ? parseInt(opt.dataset.stock || 0, 10) : 0;
+
+                // Don't allow more than what's in stock for that product
+                if (stock > 0) { qty.max = stock; } else { qty.removeAttribute('max'); }
+
+                total += price * (parseInt(qty.value, 10) || 0);
+            });
+
+            rows.classList.toggle('single', all.length === 1);   // hide the ✕ when only one row
+            totalEl.textContent = money(total);
+        }
+
+        addBtn.addEventListener('click', function () {
+            var clone = rows.querySelector('.sale-row').cloneNode(true);
+            clone.querySelector('select').selectedIndex = 0;
+            clone.querySelector('input[type="number"]').value = 1;
+            rows.appendChild(clone);
+            refresh();
+            clone.querySelector('select').focus();
+        });
+
+        rows.addEventListener('click', function (e) {
+            var btn = e.target.closest('.sale-row-remove');
+            if (!btn) return;
+            if (rows.querySelectorAll('.sale-row').length > 1) {
+                btn.closest('.sale-row').remove();
+                refresh();
+            }
+        });
+
+        rows.addEventListener('input', refresh);
+        rows.addEventListener('change', refresh);
+        refresh();
+    })();
+    </script>
 
 </body>
 </html>
