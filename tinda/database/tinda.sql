@@ -45,5 +45,8 @@ CREATE TABLE IF NOT EXISTS Sale_Details (
     FOREIGN KEY (product_ID) REFERENCES Products(product_ID)
 );
 
-INSERT INTO Categories (category_name) VALUES
-    ('Snacks'), ('Beverages'), ('Canned Goods'), ('Household'), ('Personal Care');
+INSERT INTO `Categories` (`category_name`) VALUES
+    ('Beverages'), ('Canned & Dry Goods'), ('Condiments'), ('Household'), ('Medicine'), ('Personal Care'), ('Snacks & Chips');
+
+INSERT INTO `Users` (`user_ID`, `username`, `password`, `full_name`, `created_at`) VALUES
+	(1, 'admin', 'admin123', 'Admin', '2026-11-11 15:17:42');
