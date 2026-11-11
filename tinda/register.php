@@ -59,9 +59,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <?php endif; ?>
         
         <?php if ($success): ?>
-            <div class="alert success" style="margin-bottom: 20px; padding: 10px; font-size: 13px;">
-                <?php echo $success; ?> <br><br><a href="login.php" style="color:inherit; text-decoration:underline;">Go to Login</a>
+            <div class="alert success" style="margin-bottom: 20px; padding: 15px; font-size: 14px; text-align: center;">
+                <?php echo $success; ?>
+                <p style="margin-top: 8px; font-size: 12px; color: #686D63;">Redirecting you to the login page...</p>
             </div>
+            
+            <!-- This automatically redirects to the login page after 2 seconds -->
+            <meta http-equiv="refresh" content="2;url=login.php">
         <?php endif; ?>
 
         <form method="POST" action="register.php">

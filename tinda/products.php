@@ -175,7 +175,7 @@ $deletedProducts = $stmt->get_result();
                                 <th>Name</th>
                                 <th>Price</th>
                                 <th>Stock</th>
-                                <th style="text-align:right;">Actions</th>
+                                <th style="text-align:center;">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -190,7 +190,7 @@ $deletedProducts = $stmt->get_result();
                                         </td>
                                         <td data-label="Price">₱ <?php echo number_format($p['price'], 2); ?></td>
                                         <td data-label="Stock"><?php echo $p['stock_quantity']; ?></td>
-                                        <td data-label="Actions" style="text-align:right; white-space:nowrap;">
+                                        <td data-label="Actions" style="text-align:center; white-space:nowrap;">
                                             <a href="products.php?edit=<?php echo $p['product_ID']; ?>" class="action-btn edit">Edit</a>
                                             <a href="#" class="action-btn delete" onclick="openModal(<?php echo $p['product_ID']; ?>); return false;">Delete</a>
                                         </td>

@@ -12,21 +12,21 @@
     <main class="landing">
 
         <!-- HERO -->
-            <section class="hero">
-                <div class="hero-inner">
-                    <p class="eyebrow">Store Management System</p>
-                    <h2>Your Store.<br>Your Stocks.<br>Your Sales.</h2>
-                    <p class="hero-desc">
-                        TINDA helps small Filipino stores manage products, track stock,
-                        record sales, and view reports — all in one simple place.
-                    </p>
+        <section class="hero">
+            <div class="hero-inner">
+                <p class="eyebrow">Store Management System</p>
+                <h2>Your Store.<br>Your Stocks.<br>Your Sales.</h2>
+                <p class="hero-desc">
+                    TINDA helps small Filipino stores manage products, track stock,
+                    record sales, and view reports — all in one simple place.
+                </p>
                 <div class="hero-buttons">
                     <a href="dashboard.php" class="btn btn-primary">Open Dashboard</a>
                     <a href="#how" class="btn btn-outline">How It Works</a>
                 </div>
-        <p class="hero-note">Built for sari-sari stores and small Filipino businesses.</p>
-    </div>
-</section>
+                <p class="hero-note">Built for sari-sari stores and small Filipino businesses.</p>
+            </div>
+        </section>
 
         <!-- STATS STRIP -->
         <section class="stats reveal">
