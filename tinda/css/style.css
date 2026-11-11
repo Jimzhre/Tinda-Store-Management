@@ -399,6 +399,18 @@ nav a.active:hover {
 .form-card input:focus, .form-card select:focus { outline: none; border-color: var(--primary); background-color: #fff; box-shadow: 0 0 0 4px rgba(130, 152, 121, 0.14); }
 .form-card button[type="submit"] { margin-top: 26px; width: 100%; border: none; cursor: pointer; font-family: inherit; padding: 14px 24px; font-size: 15px; font-weight: 800; border-radius: 12px; background: linear-gradient(135deg, var(--primary), #6B8361); color: var(--white); transition: all 0.25s ease; letter-spacing: 0.2px; }
 .form-card button[type="submit"]:hover { transform: translateY(-2px); box-shadow: 0 10px 22px rgba(53, 79, 60, 0.2); }
+/* Multi-item sale rows */
+.sale-rows { display: flex; flex-direction: column; gap: 12px; }
+.sale-row { display: grid; grid-template-columns: 1fr 52px; gap: 12px; align-items: end; padding: 16px; border: 1.5px solid #E6E2D5; border-radius: 14px; background-color: #FBF9F2; }
+.form-card .sale-row label { margin: 0 0 8px; }
+.sale-row-product { grid-column: 1 / -1; }
+.sale-row input, .sale-row select { background-color: var(--white); }
+.sale-row-remove { height: 50px; border: none; border-radius: 12px; background-color: #FBE6DD; color: #A5452A; font-size: 18px; font-weight: 800; cursor: pointer; transition: 0.2s; }
+.sale-row-remove:hover { background-color: var(--accent); color: var(--white); }
+.sale-rows.single .sale-row-remove { visibility: hidden; }
+#add-row { width: 100%; margin-top: 14px; text-align: center; }
+.sale-total { display: flex; justify-content: space-between; align-items: center; margin-top: 18px; padding: 14px 18px; border-radius: 12px; background-color: #F8F5EA; color: var(--dark-green); font-size: 13px; font-weight: 800; letter-spacing: 0.5px; text-transform: uppercase; }
+.sale-total strong { font-size: 22px; letter-spacing: -0.5px; }
 
 /* ===== 9. REPORTS (FILTER BAR) ===== */
 .filter-bar { background-color: var(--white); border-radius: var(--radius); padding: 22px 26px; margin-bottom: var(--space-2); box-shadow: var(--shadow-sm); border: 1px solid #EFEBDE; }
@@ -421,6 +433,20 @@ nav a.active:hover {
 .range-summary strong { color: var(--dark-green); font-weight: 800; letter-spacing: 0.2px; }
 .range-totals { display: flex; align-items: center; gap: 10px; font-weight: 800; color: var(--dark-green); font-size: 15px; }
 .range-totals .dot { color: #C0BDAE; font-weight: normal; }
+
+/* Sale details popup (Reports) */
+button.action-btn { border: none; cursor: pointer; font-family: inherit; }
+.modal-card.receipt { max-width: 480px; text-align: left; max-height: 85vh; overflow-y: auto; }
+.modal-card.receipt h3 { margin-bottom: 4px; }
+.receipt-date { font-size: 13px; color: #88907F; margin-bottom: 18px; }
+.receipt-item { display: flex; justify-content: space-between; gap: 16px; padding: 12px 0; border-bottom: 1px solid #F1EEE1; }
+.receipt-item-name { font-size: 15px; font-weight: 700; color: var(--dark-green); }
+.receipt-item-meta { font-size: 13px; color: #88907F; margin-top: 2px; }
+.receipt-item-sub { font-size: 15px; font-weight: 800; color: var(--dark-green); white-space: nowrap; }
+.receipt-empty { padding: 20px 0; text-align: center; color: #88907F; font-style: italic; }
+.receipt-total { display: flex; justify-content: space-between; align-items: center; padding: 16px 0 4px; font-size: 13px; font-weight: 800; letter-spacing: 0.5px; text-transform: uppercase; color: var(--dark-green); }
+.receipt-total strong { font-size: 22px; letter-spacing: -0.5px; text-transform: none; }
+.modal-card.receipt .modal-actions { margin-top: 18px; }
 
 /* ===== 10. TOAST NOTIFICATIONS ===== */
 #toast-container { position: fixed; top: 90px; right: 24px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
@@ -1071,6 +1097,17 @@ nav a.active:hover {
     .nav-logout { margin-left: 0; max-width: none; }
 
     body.menu-open { overflow: hidden; }
+
+    .sale-row { padding: 18px; }
+    .sale-row-remove { height: 56px; }
+    .sale-total { font-size: 15px; }
+    .sale-total strong { font-size: 26px; }
+    #add-row { font-size: 18px; padding: 15px; }
+
+    .receipt-date { font-size: 15px; }
+    .receipt-item-name, .receipt-item-sub { font-size: 17px; }
+    .receipt-item-meta { font-size: 15px; }
+    .receipt-total strong { font-size: 26px; }
 }
 
 @media (max-width: 767px) {
