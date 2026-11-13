@@ -21,7 +21,7 @@ $todayCount = $stmt->get_result()->fetch_assoc()['c'];
 $stmt->close();
 
 // --- Total products ---
-$stmt = $conn->prepare("SELECT COUNT(*) AS c FROM Products WHERE user_ID = ?");
+$stmt = $conn->prepare("SELECT COUNT(*) AS c FROM Products WHERE user_ID = ? AND product_name NOT LIKE '[Archived]%'");
 $stmt->bind_param("i", $userId);
 $stmt->execute();
 $totalProducts = $stmt->get_result()->fetch_assoc()['c'];
@@ -60,7 +60,7 @@ for ($i = 0; $i < 7; $i++) {
 if ($maxSale == 0) $maxSale = 1; 
 
 // --- Low stock count ---
-$stmt = $conn->prepare("SELECT COUNT(*) AS c FROM Products WHERE stock_quantity <= low_stock_threshold AND user_ID = ?");
+$stmt = $conn->prepare("SELECT COUNT(*) AS c FROM Products WHERE stock_quantity <= low_stock_threshold AND user_ID = ? AND product_name NOT LIKE '[Archived]%'");
 $stmt->bind_param("i", $userId);
 $stmt->execute();
 $lowStock = $stmt->get_result()->fetch_assoc()['c'];
@@ -73,7 +73,7 @@ $stmt->close();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>TINDA | Dashboard</title>
-    <link rel="stylesheet" href="css/style.css?v=4">
+    <link rel="stylesheet" href="css/style.css?v=8">
 </head>
 <body>
 
@@ -188,7 +188,7 @@ $stmt->close();
                         <tbody>
                             <?php
                             // NEW: Prepared statement for Recent Transactions
-                            $stmt = $conn->prepare("SELECT sale_ID, sale_date, total_amount FROM Sales WHERE user_ID = ? ORDER BY sale_date DESC LIMIT 5");
+                            $stmt = $conn->prepare("SELECT s.sale_ID, s.sale_date, s.total_amount, (SELECT COUNT(*) FROM Sales s2 WHERE s2.user_ID = s.user_ID AND s2.sale_ID <= s.sale_ID) AS sale_no FROM Sales s WHERE s.user_ID = ? ORDER BY s.sale_date DESC LIMIT 5");
                             $stmt->bind_param("i", $userId);
                             $stmt->execute();
                             $recent = $stmt->get_result();
@@ -197,7 +197,7 @@ $stmt->close();
                                 while ($row = $recent->fetch_assoc()):
                             ?>
                                 <tr>
-                                    <td data-label="Sale #">#<?php echo $row['sale_ID']; ?></td>
+                                    <td data-label="Sale #">#<?php echo $row['sale_no']; ?></td>
                                     <td data-label="Date"><?php echo date('M j, g:i A', strtotime($row['sale_date'])); ?></td>
                                     <td data-label="Total">₱ <?php echo number_format($row['total_amount'], 2); ?></td>
                                 </tr>

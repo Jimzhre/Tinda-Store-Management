@@ -111,7 +111,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // Products for dropdown (ONLY this user's products)
-$stmt = $conn->prepare("SELECT product_ID, product_name, price, stock_quantity FROM Products WHERE stock_quantity > 0 AND user_ID = ? AND product_name NOT LIKE '[Deleted]%' ORDER BY product_name");
+$stmt = $conn->prepare("SELECT product_ID, product_name, price, stock_quantity FROM Products WHERE stock_quantity > 0 AND user_ID = ? AND product_name NOT LIKE '[Archived]%' ORDER BY product_name");
 $stmt->bind_param("i", $userId);
 $stmt->execute();
 $productResult = $stmt->get_result();
@@ -119,7 +119,7 @@ $productList = $productResult->fetch_all(MYSQLI_ASSOC);
 $stmt->close();
 
 // Recent sales (ONLY this user's sales)
-$stmt = $conn->prepare("SELECT sale_ID, sale_date, total_amount FROM Sales WHERE user_ID = ? ORDER BY sale_date DESC LIMIT 10");
+$stmt = $conn->prepare("SELECT s.sale_ID, s.sale_date, s.total_amount, (SELECT COUNT(*) FROM Sales s2 WHERE s2.user_ID = s.user_ID AND s2.sale_ID <= s.sale_ID) AS sale_no FROM Sales s WHERE s.user_ID = ? ORDER BY s.sale_date DESC LIMIT 10");
 $stmt->bind_param("i", $userId);
 $stmt->execute();
 $recent = $stmt->get_result();
@@ -131,7 +131,7 @@ $recent = $stmt->get_result();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>TINDA | Sales</title>
-    <link rel="stylesheet" href="css/style.css?v=7">
+    <link rel="stylesheet" href="css/style.css?v=8">
 </head>
 <body>
 
@@ -215,7 +215,7 @@ $recent = $stmt->get_result();
                             <?php if ($recent && $recent->num_rows > 0): ?>
                                 <?php while ($r = $recent->fetch_assoc()): ?>
                                     <tr>
-                                        <td data-label="Sale #">#<?php echo $r['sale_ID']; ?></td>
+                                        <td data-label="Sale #">#<?php echo $r['sale_no']; ?></td>
                                         <td data-label="Date"><?php echo date('M j, g:i A', strtotime($r['sale_date'])); ?></td>
                                         <td data-label="Total">₱ <?php echo number_format($r['total_amount'], 2); ?></td>
                                     </tr>

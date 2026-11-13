@@ -35,7 +35,8 @@ $stmt->close();
 // --- Range sales list ---
 $stmt = $conn->prepare("
     SELECT s.sale_ID, s.sale_date, s.total_amount,
-           COALESCE(SUM(sd.quantity), 0) AS items
+            (SELECT COUNT(*) FROM Sales s2 WHERE s2.user_ID = s.user_ID AND s2.sale_ID <= s.sale_ID) AS sale_no,
+            COALESCE(SUM(sd.quantity), 0) AS items
     FROM Sales s
     LEFT JOIN Sale_Details sd ON s.sale_ID = sd.sale_ID
     WHERE DATE(s.sale_date) BETWEEN ? AND ? AND s.user_ID = ?
@@ -200,7 +201,7 @@ $stmt4->close();
                             <?php if ($sales->num_rows > 0): ?>
                                 <?php while ($s = $sales->fetch_assoc()): ?>
                                     <tr>
-                                        <td data-label="Sale #">#<?php echo $s['sale_ID']; ?></td>
+                                        <td data-label="Sale #">#<?php echo $s['sale_no']; ?></td>
                                         <td data-label="Date"><?php echo date('M j, g:i A', strtotime($s['sale_date'])); ?></td>
                                         <td data-label="Items"><?php echo $s['items']; ?></td>
                                         <td data-label="Total">₱ <?php echo number_format($s['total_amount'], 2); ?></td>
@@ -228,7 +229,7 @@ $stmt4->close();
                         <?php $rank = 1; while ($t = $topProducts->fetch_assoc()): ?>
                             <div class="top-row">
                                 <span class="top-rank"><?php echo $rank++; ?></span>
-                                <span class="top-name"><?php echo htmlspecialchars($t['product_name']); ?></span>
+                                    <span class="top-name"><?php echo htmlspecialchars($t['product_name']); ?></span>
                                 <span class="top-count"><?php echo $t['sold']; ?> sold</span>
                             </div>
                         <?php endwhile; ?>

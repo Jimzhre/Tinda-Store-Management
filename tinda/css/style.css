@@ -377,6 +377,9 @@ nav a.active:hover {
 .action-btn.edit:hover { background-color: var(--primary); color: white; }
 .action-btn.delete { background-color: #FBE6DD; color: #A5452A; }
 .action-btn.delete:hover { background-color: var(--accent); color: white; }
+.action-btn.archive { background-color: #FBF0D9; color: #8A5A12; }
+.action-btn.archive:hover { background-color: var(--highlight); color: var(--white); }
+#delete-modal .modal-icon { background-color: #FBF0D9; }
 
 /* Top Selling (Dashboard) */
 .dash-lower { display: grid; grid-template-columns: 1.4fr 1fr; gap: var(--space-3); margin-bottom: var(--space-4); }

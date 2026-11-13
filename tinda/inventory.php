@@ -9,7 +9,7 @@ $stmt = $conn->prepare("
             p.low_stock_threshold, c.category_name
     FROM Products p
     LEFT JOIN Categories c ON p.category_ID = c.category_ID
-    WHERE p.user_ID = ? AND p.product_name NOT LIKE '[Deleted]%'
+    WHERE p.user_ID = ? AND p.product_name NOT LIKE '[Archived]%'
     ORDER BY p.product_name
 ");
 $stmt->bind_param("i", $userId);
@@ -22,7 +22,7 @@ $products = $stmt->get_result();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>TINDA | Inventory</title>
-    <link rel="stylesheet" href="css/style.css?v=4">
+    <link rel="stylesheet" href="css/style.css?v=8">
 </head>
 <body>
 
